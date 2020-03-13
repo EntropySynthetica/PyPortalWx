@@ -25,3 +25,8 @@ temperature = adt.temperature
 
 print(temperature)
 
+while True:
+    print("Temp:")
+    temperature = adt.temperature
+    print(temperature)
+    time.sleep(60)
