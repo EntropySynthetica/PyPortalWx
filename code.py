@@ -3,8 +3,9 @@ import time
 import board
 import busio
 import terminalio  # For using the terminal basic font
+import displayio
 import adafruit_adt7410  # For polling the onboard 7410 Temp Sensor
-from adafruit_pyportal import PyPortal
+#from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 
@@ -30,26 +31,35 @@ print(temperature)
 
 display = board.DISPLAY
 
+font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
+color = 0x0000FF
+
+
+
 while True:
     print("Temp:")
     temperature = adt.temperature
     temperature = (temperature * 1.8 +32)
     print(temperature)
 
-    # Set text, font, and color
     temp_in_text = "Temp In: " + str(temperature)
-    #font = bitmap_font.load_font("/fonts/Helvetica-Bold-16.bdf")
-    font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
-    color = 0x0000FF
-    
-    # Create the test label
     temp_in_text_area = label.Label(font, text=temp_in_text, color=color)
-    
-    # Set the location
     temp_in_text_area.x = 90
     temp_in_text_area.y = 100
+    text1_group = displayio.Group()
+    text1_group.append(temp_in_text_area)
     
-    # Show it
-    display.show(temp_in_text_area)
+    time_text = "Time: "
+    time_text_area = label.Label(font, text=time_text, color=color)
+    time_text_area.x = 130
+    time_text_area.y = 10
+    text2_group = displayio.Group()
+    text2_group.append(time_text_area)
+
+    group = displayio.Group()
+    group.append(text1_group)
+    group.append(text2_group)
+
+    display.show(group)
 
     time.sleep(1)
