@@ -51,32 +51,35 @@ color = 0x0000FF
 print("Initializing")
 wifi.connect()
 
-# Get the time from the time api server. 
-response = None
-while True:
-    try:
-        print("Fetching json from", time_api)
-        response = wifi.get(time_api)
-        break
-    except (ValueError, RuntimeError) as e:
-        print("Failed to get data, retrying\n", e)
-        continue
+def sync_rtc(time_api):
+    # Get the time from the time api server. 
+    response = None
+    while True:
+        try:
+            print("Fetching json from", time_api)
+            response = wifi.get(time_api)
+            break
+        except (ValueError, RuntimeError) as e:
+            print("Failed to get data, retrying\n", e)
+            continue
 
-# Parse the time out of the API Response
-json = response.json()
-current_time = json['datetime']
-the_date, the_time = current_time.split('T')
-year, month, mday = [int(x) for x in the_date.split('-')]
-the_time = the_time.split('.')[0]
-hours, minutes, seconds = [int(x) for x in the_time.split(':')]
-year_day = json['day_of_year']
-week_day = json['day_of_week']
-is_dst = json['dst']
+    # Parse the time out of the API Response
+    json = response.json()
+    current_time = json['datetime']
+    the_date, the_time = current_time.split('T')
+    year, month, mday = [int(x) for x in the_date.split('-')]
+    the_time = the_time.split('.')[0]
+    hours, minutes, seconds = [int(x) for x in the_time.split(':')]
+    year_day = json['day_of_year']
+    week_day = json['day_of_week']
+    is_dst = json['dst']
 
-# Update the RTC
-now = time.struct_time((year, month, mday, hours, minutes, seconds, week_day, year_day, is_dst))
-print(now)
-the_rtc.datetime = now
+    # Update the RTC
+    now = time.struct_time((year, month, mday, hours, minutes, seconds, week_day, year_day, is_dst))
+    print(now)
+    the_rtc.datetime = now
+
+sync_rtc(time_api)
 
 time.sleep(10)
 
@@ -92,7 +95,7 @@ while True:
     text1_group.append(temp_in_text_area)
     
     now = time.localtime()
-    timenow = str(now[3]) + ":" + str(now[4]) + ":" + str(now[5])
+    timenow = str(now[3]) + ":" + str("{:02d}".format(now[4])) + ":" + str("{:02d}".format(now[5]))
     time_text = "Time: " + timenow
     time_text_area = label.Label(font, text=time_text, color=color)
     time_text_area.x = 130
