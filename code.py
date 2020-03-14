@@ -44,7 +44,6 @@ display = board.DISPLAY
 
 # Set some Global variables
 time_api = "http://worldtimeapi.org/api/ip"
-
 font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
 color = 0x0000FF
 
@@ -79,22 +78,30 @@ def sync_rtc(time_api):
     print(now)
     the_rtc.datetime = now
 
+def get_temp_in():
+    temperature = adt.temperature
+    temperature = round((temperature * 1.8 +32),1)
+    return temperature
+
 sync_rtc(time_api)
+temp_in = get_temp_in()
 
 time.sleep(10)
 
 while True:
-    temperature = adt.temperature
-    temperature = (temperature * 1.8 +32)
+    now = time.localtime()
 
-    temp_in_text = "Temp In: " + str(temperature)
+    # Update the internal temp only once per min at 10 seconds past. 
+    if (now[5] == 10):
+        temp_in = get_temp_in()
+
+    temp_in_text = "Temp In: " + str(temp_in)
     temp_in_text_area = label.Label(font, text=temp_in_text, color=color)
     temp_in_text_area.x = 90
     temp_in_text_area.y = 100
     text1_group = displayio.Group()
     text1_group.append(temp_in_text_area)
     
-    now = time.localtime()
     timenow = str(now[3]) + ":" + str("{:02d}".format(now[4])) + ":" + str("{:02d}".format(now[5]))
     time_text = "Time: " + timenow
     time_text_area = label.Label(font, text=time_text, color=color)
