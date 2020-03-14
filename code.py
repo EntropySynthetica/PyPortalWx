@@ -6,6 +6,7 @@ import neopixel
 import rtc # For interfacing with the Real Time Clock
 import terminalio  # For using the terminal basic font
 import displayio # Library for writing text / graphics to the screen
+import adafruit_imageload # Library to load our background
 import adafruit_adt7410  # For polling the onboard 7410 Temp Sensor
 from digitalio import DigitalInOut # Enabling DigitalIO so we can talk to the ESP32 Wifi chip.
 #from adafruit_pyportal import PyPortal
@@ -89,11 +90,14 @@ temp_in = get_temp_in()
 time.sleep(10)
 
 while True:
+    # Load the current time from the RTC
     now = time.localtime()
 
     # Update the internal temp only once per min at 10 seconds past. 
     if (now[5] == 10):
         temp_in = get_temp_in()
+
+    # Display the Background
 
     temp_in_text = "Temp In: " + str(temp_in)
     temp_in_text_area = label.Label(font, text=temp_in_text, color=color)
@@ -102,18 +106,46 @@ while True:
     text1_group = displayio.Group()
     text1_group.append(temp_in_text_area)
     
-    timenow = str(now[3]) + ":" + str("{:02d}".format(now[4])) + ":" + str("{:02d}".format(now[5]))
-    time_text = "Time: " + timenow
+    # Figure out if we are AM or PM and convert the clock to 12 hour.
+    if (now[3] >= 12):
+        time_tag = "PM"
+    else:
+        time_tag = "AM"
+
+    if (now[3] >= 13):
+        time_hour = str(now[3] - 12)
+    else:
+        time_hour = str(now[3])
+
+    # Display Time
+    timenow = time_hour + ":" + str("{:02d}".format(now[4])) + ":" + str("{:02d}".format(now[5])) + " " + time_tag
+    time_text = timenow
     time_text_area = label.Label(font, text=time_text, color=color)
-    time_text_area.x = 130
+    time_text_area.x = 220
     time_text_area.y = 10
     text2_group = displayio.Group()
     text2_group.append(time_text_area)
 
+    # Display Date
+    day_name = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat','Sun']
+    month_name = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    day_name = day_name[now[6]]
+    month_name = month_name[now[1] - 1]
+    datenow = day_name + " " + month_name + " " + str(now[2])
+    date_text = datenow
+    date_text_area = label.Label(font, text=date_text, color=color)
+    date_text_area.x = 220
+    date_text_area.y = 30
+    text3_group = displayio.Group()
+    text3_group.append(date_text_area)
+
+    # Show everything on screen.
     group = displayio.Group()
     group.append(text1_group)
     group.append(text2_group)
+    group.append(text3_group)
 
     display.show(group)
 
+    # Our Screen Refresh Rate
     time.sleep(0.5)
