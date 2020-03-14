@@ -34,13 +34,12 @@ display = board.DISPLAY
 font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
 color = 0x0000FF
 
-
+print("Initializing")
+time.sleep(10)
 
 while True:
-    print("Temp:")
     temperature = adt.temperature
     temperature = (temperature * 1.8 +32)
-    print(temperature)
 
     temp_in_text = "Temp In: " + str(temperature)
     temp_in_text_area = label.Label(font, text=temp_in_text, color=color)
@@ -49,7 +48,9 @@ while True:
     text1_group = displayio.Group()
     text1_group.append(temp_in_text_area)
     
-    time_text = "Time: "
+    now = time.localtime()
+    timenow = str(now[3]) + ":" + str(now[4]) + ":" + str(now[5])
+    time_text = "Time: " + timenow
     time_text_area = label.Label(font, text=time_text, color=color)
     time_text_area.x = 130
     time_text_area.y = 10
@@ -62,4 +63,4 @@ while True:
 
     display.show(group)
 
-    time.sleep(1)
+    time.sleep(0.5)
