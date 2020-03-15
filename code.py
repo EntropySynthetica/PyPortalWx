@@ -114,6 +114,8 @@ while True:
 
     if (now[3] >= 13):
         time_hour = str(now[3] - 12)
+    elif (now[3] == 0):
+        time_hour = "12"
     else:
         time_hour = str(now[3])
 
