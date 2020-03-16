@@ -97,8 +97,11 @@ while True:
     if (now[5] == 10):
         temp_in = get_temp_in()
 
-    # Display the Background
+    # Resync the clock at 11 min past the hour.  
+    if ((now[4] == 11) and (now[5] == 0)):
+        sync_rtc(time_api)
 
+    # Display the Background
     temp_in_text = "Temp In: " + str(temp_in)
     temp_in_text_area = label.Label(font, text=temp_in_text, color=color)
     temp_in_text_area.x = 90
