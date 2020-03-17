@@ -56,7 +56,7 @@ def sync_rtc(time_api):
     response = None
     while True:
         try:
-            print("Fetching json from", time_api)
+            print("Fetching time from", time_api)
             response = wifi.get(time_api)
             break
         except (ValueError, RuntimeError) as e:
@@ -79,6 +79,22 @@ def sync_rtc(time_api):
     print(now)
     the_rtc.datetime = now
 
+def get_current_wx(cityid, api_key):
+    poll_URL = "https://api.openweathermap.org/data/2.5/weather?id=" + cityid + "&units=imperial&appid=" + api_key 
+
+    response = None
+    while True:
+        try:
+            print("Fetching weather from", poll_URL)
+            response = wifi.get(poll_URL)
+            break
+        except (ValueError, RuntimeError) as e:
+            print("Failed to get data, retrying\n", e)
+            continue
+
+    json = response.json()
+    return json
+
 def get_temp_in():
     temperature = adt.temperature
     temperature = round((temperature * 1.8 +32),1)
@@ -86,6 +102,7 @@ def get_temp_in():
 
 sync_rtc(time_api)
 temp_in = get_temp_in()
+current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 
 time.sleep(10)
 
@@ -101,11 +118,11 @@ while True:
     if ((now[4] == 11) and (now[5] == 0)):
         sync_rtc(time_api)
 
-    # Display the Background
+    # Display Indoor Temp
     temp_in_text = "Temp In: " + str(temp_in)
     temp_in_text_area = label.Label(font, text=temp_in_text, color=color)
-    temp_in_text_area.x = 90
-    temp_in_text_area.y = 100
+    temp_in_text_area.x = 190
+    temp_in_text_area.y = 90
     text1_group = displayio.Group()
     text1_group.append(temp_in_text_area)
     
@@ -144,11 +161,38 @@ while True:
     text3_group = displayio.Group()
     text3_group.append(date_text_area)
 
+    # Display Outdoor Temp
+    temp_out_text = "Temp Out: " + str(round(current_wx['main']['temp'],1))
+    temp_out_text_area = label.Label(font, text=temp_out_text, color=color)
+    temp_out_text_area.x = 190
+    temp_out_text_area.y = 110
+    text4_group = displayio.Group()
+    text4_group.append(temp_out_text_area)
+
+    # Current Conditions
+    city_out_text = "Conditions in " + current_wx['name']
+    city_out_text_area = label.Label(font, text=city_out_text, color=color)
+    city_out_text_area.x = 10
+    city_out_text_area.y = 10
+    text5_group = displayio.Group()
+    text5_group.append(city_out_text_area)
+
+    # Display Conditions
+    conditions_out_text = current_wx['weather'][0]['description']
+    conditions_out_text_area = label.Label(font, text=conditions_out_text, color=color)
+    conditions_out_text_area.x = 10
+    conditions_out_text_area.y = 30
+    text6_group = displayio.Group()
+    text6_group.append(conditions_out_text_area)
+
     # Show everything on screen.
-    group = displayio.Group()
+    group = displayio.Group(max_size=6)
     group.append(text1_group)
     group.append(text2_group)
     group.append(text3_group)
+    group.append(text4_group)
+    group.append(text5_group)
+    group.append(text6_group)
 
     display.show(group)
 
