@@ -118,6 +118,10 @@ while True:
     if ((now[4] == 11) and (now[5] == 0)):
         sync_rtc(time_api)
 
+    # Resync the weather every 10 min.
+    if (now[4] % 10 == 0) and (now[5] == 0):
+        current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
+
     # Display Indoor Temp
     temp_in_text = "Temp In: " + str(temp_in)
     temp_in_text_area = label.Label(font, text=temp_in_text, color=color)
