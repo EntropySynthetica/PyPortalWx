@@ -193,8 +193,8 @@ while True:
     text6_group = displayio.Group()
     text6_group.append(conditions_out_text_area)
 
-    bg1_group = Rect(0, 0, 340, 40, fill=color_darkpurple)
-    bg2_group = Rect(0, 40, 340, 300, fill=color_darkblue)
+    bg1_group = Rect(0, 0, 340, 45, fill=color_darkpurple)
+    bg2_group = Rect(0, 45, 340, 300, fill=color_darkblue)
 
     # Show everything on screen.
     group = displayio.Group(max_size=8)
