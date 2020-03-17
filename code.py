@@ -8,6 +8,7 @@ import terminalio  # For using the terminal basic font
 import displayio # Library for writing text / graphics to the screen
 import adafruit_imageload # Library to load our background
 import adafruit_adt7410  # For polling the onboard 7410 Temp Sensor
+from adafruit_display_shapes.rect import Rect # Library to draw rectangles
 from digitalio import DigitalInOut # Enabling DigitalIO so we can talk to the ESP32 Wifi chip.
 #from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
@@ -46,7 +47,10 @@ display = board.DISPLAY
 # Set some Global variables
 time_api = "http://worldtimeapi.org/api/ip"
 font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
-color = 0x0000FF
+color_blue = 0x0000FF
+color_white = 0xFFFFFF
+color_darkpurple = 0x2e0142
+color_darkblue = 0x00004a
 
 print("Initializing")
 wifi.connect()
@@ -124,7 +128,7 @@ while True:
 
     # Display Indoor Temp
     temp_in_text = "Temp In: " + str(temp_in)
-    temp_in_text_area = label.Label(font, text=temp_in_text, color=color)
+    temp_in_text_area = label.Label(font, text=temp_in_text, color=color_white)
     temp_in_text_area.x = 190
     temp_in_text_area.y = 90
     text1_group = displayio.Group()
@@ -146,7 +150,7 @@ while True:
     # Display Time
     timenow = time_hour + ":" + str("{:02d}".format(now[4])) + ":" + str("{:02d}".format(now[5])) + " " + time_tag
     time_text = timenow
-    time_text_area = label.Label(font, text=time_text, color=color)
+    time_text_area = label.Label(font, text=time_text, color=color_white)
     time_text_area.x = 220
     time_text_area.y = 10
     text2_group = displayio.Group()
@@ -159,7 +163,7 @@ while True:
     month_name = month_name[now[1] - 1]
     datenow = day_name + " " + month_name + " " + str(now[2])
     date_text = datenow
-    date_text_area = label.Label(font, text=date_text, color=color)
+    date_text_area = label.Label(font, text=date_text, color=color_white)
     date_text_area.x = 220
     date_text_area.y = 30
     text3_group = displayio.Group()
@@ -167,7 +171,7 @@ while True:
 
     # Display Outdoor Temp
     temp_out_text = "Temp Out: " + str(round(current_wx['main']['temp'],1))
-    temp_out_text_area = label.Label(font, text=temp_out_text, color=color)
+    temp_out_text_area = label.Label(font, text=temp_out_text, color=color_white)
     temp_out_text_area.x = 190
     temp_out_text_area.y = 110
     text4_group = displayio.Group()
@@ -175,7 +179,7 @@ while True:
 
     # Current Conditions
     city_out_text = "Conditions in " + current_wx['name']
-    city_out_text_area = label.Label(font, text=city_out_text, color=color)
+    city_out_text_area = label.Label(font, text=city_out_text, color=color_white)
     city_out_text_area.x = 10
     city_out_text_area.y = 10
     text5_group = displayio.Group()
@@ -183,14 +187,19 @@ while True:
 
     # Display Conditions
     conditions_out_text = current_wx['weather'][0]['description']
-    conditions_out_text_area = label.Label(font, text=conditions_out_text, color=color)
+    conditions_out_text_area = label.Label(font, text=conditions_out_text, color=color_white)
     conditions_out_text_area.x = 10
     conditions_out_text_area.y = 30
     text6_group = displayio.Group()
     text6_group.append(conditions_out_text_area)
 
+    bg1_group = Rect(0, 0, 340, 40, fill=color_darkpurple)
+    bg2_group = Rect(0, 40, 340, 300, fill=color_darkblue)
+
     # Show everything on screen.
-    group = displayio.Group(max_size=6)
+    group = displayio.Group(max_size=8)
+    group.append(bg1_group)
+    group.append(bg2_group)
     group.append(text1_group)
     group.append(text2_group)
     group.append(text3_group)
