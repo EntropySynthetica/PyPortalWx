@@ -50,6 +50,7 @@ font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
 color_blue = 0x0000FF
 color_white = 0xFFFFFF
 color_darkpurple = 0x2e0142
+color_purple = 0x8323ad
 color_darkblue = 0x00004a
 
 print("Initializing")
@@ -193,7 +194,7 @@ while True:
     text6_group = displayio.Group()
     text6_group.append(conditions_out_text_area)
 
-    bg1_group = Rect(0, 0, 340, 45, fill=color_darkpurple)
+    bg1_group = Rect(0, 0, 340, 45, fill=color_purple)
     bg2_group = Rect(0, 45, 340, 300, fill=color_darkblue)
 
     # Show everything on screen.
