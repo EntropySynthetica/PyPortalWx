@@ -197,10 +197,18 @@ while True:
     bg1_group = Rect(0, 0, 340, 45, fill=color_purple)
     bg2_group = Rect(0, 45, 340, 300, fill=color_darkblue)
 
+    # Weather Conditions Icon
+    icon_path = "/icons/" + current_wx['weather'][0]['icon'] + ".bmp"
+    my_bitmap = displayio.OnDiskBitmap(open(icon_path, "rb"))
+    my_tilegrid = displayio.TileGrid(my_bitmap, pixel_shader=displayio.ColorConverter())
+    my_tilegrid.x = 20
+    my_tilegrid.y = 45
+
     # Show everything on screen.
-    group = displayio.Group(max_size=8)
+    group = displayio.Group(max_size=9)
     group.append(bg1_group)
     group.append(bg2_group)
+    group.append(my_tilegrid)
     group.append(text1_group)
     group.append(text2_group)
     group.append(text3_group)
