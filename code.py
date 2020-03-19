@@ -6,11 +6,9 @@ import neopixel
 import rtc # For interfacing with the Real Time Clock
 import terminalio  # For using the terminal basic font
 import displayio # Library for writing text / graphics to the screen
-import adafruit_imageload # Library to load our background
 import adafruit_adt7410  # For polling the onboard 7410 Temp Sensor
 from adafruit_display_shapes.rect import Rect # Library to draw rectangles
 from digitalio import DigitalInOut # Enabling DigitalIO so we can talk to the ESP32 Wifi chip.
-#from adafruit_pyportal import PyPortal
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
