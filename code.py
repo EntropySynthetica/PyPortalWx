@@ -103,10 +103,11 @@ def get_temp_in():
     temperature = round((temperature * 1.8 +32),1)
     return temperature
 
+# Wind Degrees to Cardinal solution from https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
 def degree_to_cardinal(wind_degrees):
     val=int((wind_degrees/22.5)+.5)
-    arr=["N","NNE","NE","ENE","E","ESE", "SE", "SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
-    return arr[(val % 16)]
+    compass=["N","NNE","NE","ENE","E","ESE", "SE", "SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
+    return compass[(val % 16)]
 
 sync_rtc(time_api)
 temp_in = get_temp_in()
