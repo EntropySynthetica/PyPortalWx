@@ -103,6 +103,11 @@ def get_temp_in():
     temperature = round((temperature * 1.8 +32),1)
     return temperature
 
+def degree_to_cardinal(wind_degrees):
+    val=int((wind_degrees/22.5)+.5)
+    arr=["N","NNE","NE","ENE","E","ESE", "SE", "SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
+    return arr[(val % 16)]
+
 sync_rtc(time_api)
 temp_in = get_temp_in()
 current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
@@ -124,14 +129,6 @@ while True:
     # Resync the weather every 10 min.
     if (now[4] % 10 == 0) and (now[5] == 0):
         current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
-
-    # Display Indoor Temp
-    temp_in_text = "Temp In: " + str(temp_in)
-    temp_in_text_area = label.Label(font, text=temp_in_text, color=color_white)
-    temp_in_text_area.x = 190
-    temp_in_text_area.y = 90
-    text1_group = displayio.Group()
-    text1_group.append(temp_in_text_area)
     
     # Figure out if we are AM or PM and convert the clock to 12 hour.
     if (now[3] >= 12):
@@ -171,13 +168,40 @@ while True:
     # Display Outdoor Temp
     temp_out_text = "Temp Out: " + str(round(current_wx['main']['temp'],1))
     temp_out_text_area = label.Label(font, text=temp_out_text, color=color_white)
-    temp_out_text_area.x = 190
-    temp_out_text_area.y = 110
+    temp_out_text_area.x = 180
+    temp_out_text_area.y = 90
     text4_group = displayio.Group()
     text4_group.append(temp_out_text_area)
 
+    wind_dir = degree_to_cardinal(current_wx['wind']['deg'])
+
+    # Display Wind
+    wind_in_text = "Wind: " + str(round(current_wx['wind']['speed'],0)) + " " + wind_dir
+    wind_in_text_area = label.Label(font, text=wind_in_text, color=color_white)
+    wind_in_text_area.x = 180
+    wind_in_text_area.y = 110
+    text1_group = displayio.Group()
+    text1_group.append(wind_in_text_area)
+
+    # Display Humidity
+    hum_text = "Hum: " + str(round(current_wx['main']['humidity'],1)) + "%"
+    hum_text_area = label.Label(font, text=hum_text, color=color_white)
+    hum_text_area.x = 180
+    hum_text_area.y = 130
+    text7_group = displayio.Group()
+    text7_group.append(hum_text_area)
+
+    # Display Baro
+    baro_text = "Baro: " + str(round((current_wx['main']['pressure'] * 0.02961),2))
+    baro_text_area = label.Label(font, text=baro_text, color=color_white)
+    baro_text_area.x = 180
+    baro_text_area.y = 150
+    text8_group = displayio.Group()
+    text8_group.append(baro_text_area)
+
+
     # Current Conditions
-    city_out_text = "Conditions in " + current_wx['name']
+    city_out_text = "Conditions at " + current_wx['name']
     city_out_text_area = label.Label(font, text=city_out_text, color=color_white)
     city_out_text_area.x = 10
     city_out_text_area.y = 10
@@ -203,12 +227,14 @@ while True:
     my_tilegrid.y = 45
 
     # Show everything on screen.
-    group = displayio.Group(max_size=9)
+    group = displayio.Group(max_size=11)
     group.append(bg1_group)
     group.append(bg2_group)
     group.append(my_tilegrid)
     group.append(text1_group)
     group.append(text2_group)
+    group.append(text7_group)
+    group.append(text8_group)
     group.append(text3_group)
     group.append(text4_group)
     group.append(text5_group)
