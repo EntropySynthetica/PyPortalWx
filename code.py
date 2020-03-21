@@ -83,15 +83,32 @@ def get_current_wx(cityid, api_key):
     response = None
     while True:
         try:
-            print("Fetching weather from", poll_URL)
+            print("Fetching weather")
             response = wifi.get(poll_URL)
             break
         except (ValueError, RuntimeError) as e:
-            print("Failed to get data, retrying\n", e)
+            print("Failed to get weather, retrying\n", e)
             continue
 
     weather_json = response.json()
     return weather_json
+
+def get_forecast_wx(cityid, api_key):
+    # Get the weather forecast from the weather API server
+    poll_URL = "https://api.openweathermap.org/data/2.5/forecast?id=" + cityid + "&units=imperial&appid=" + api_key 
+
+    response = None
+    while True:
+        try:
+            print("Fetching forecast")
+            response = wifi.get(poll_URL)
+            break
+        except (ValueError, RuntimeError) as e:
+            print("Failed to get forecast, retrying\n", e)
+            continue
+
+    forecast_json = response.json()
+    return forecast_json
 
 def get_temp_in():
     temperature = adt.temperature
@@ -107,6 +124,11 @@ def degree_to_cardinal(wind_degrees):
 sync_rtc()
 temp_in = get_temp_in()
 current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
+forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
+
+for item in forecast_wx['list']:
+    print(item['dt'])
+    print(item['main']['temp'])
 
 time.sleep(10)
 
