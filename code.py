@@ -98,8 +98,8 @@ def get_temp_in():
     temperature = round((temperature * 1.8 +32),1)
     return temperature
 
-# Wind Degrees to Cardinal solution from https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
 def degree_to_cardinal(wind_degrees):
+    # Wind Degrees to Cardinal solution from https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
     val=int((wind_degrees/22.5)+.5)
     compass=["N","NNE","NE","ENE","E","ESE", "SE", "SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
     return compass[(val % 16)]
@@ -145,8 +145,8 @@ while True:
     time_text_area = label.Label(font, text=time_text, color=color_white)
     time_text_area.x = 220
     time_text_area.y = 10
-    text2_group = displayio.Group()
-    text2_group.append(time_text_area)
+    time_text_group = displayio.Group()
+    time_text_group.append(time_text_area)
 
     # Display Date
     day_name = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat','Sun']
@@ -158,16 +158,16 @@ while True:
     date_text_area = label.Label(font, text=date_text, color=color_white)
     date_text_area.x = 220
     date_text_area.y = 30
-    text3_group = displayio.Group()
-    text3_group.append(date_text_area)
+    date_text_group = displayio.Group()
+    date_text_group.append(date_text_area)
 
     # Display Outdoor Temp
     temp_out_text = "Temp Out: " + str(round(current_wx['main']['temp'],1))
     temp_out_text_area = label.Label(font, text=temp_out_text, color=color_white)
     temp_out_text_area.x = 180
     temp_out_text_area.y = 90
-    text4_group = displayio.Group()
-    text4_group.append(temp_out_text_area)
+    temp_out_text_group = displayio.Group()
+    temp_out_text_group.append(temp_out_text_area)
 
     # Display Wind
     wind_dir = degree_to_cardinal(current_wx['wind']['deg'])
@@ -175,40 +175,40 @@ while True:
     wind_text_area = label.Label(font, text=wind_text, color=color_white)
     wind_text_area.x = 180
     wind_text_area.y = 110
-    text1_group = displayio.Group()
-    text1_group.append(wind_text_area)
+    wind_text_group = displayio.Group()
+    wind_text_group.append(wind_text_area)
 
     # Display Humidity
     hum_text = "Hum: " + str(round(current_wx['main']['humidity'],1)) + "%"
     hum_text_area = label.Label(font, text=hum_text, color=color_white)
     hum_text_area.x = 180
     hum_text_area.y = 130
-    text7_group = displayio.Group()
-    text7_group.append(hum_text_area)
+    hum_text_group = displayio.Group()
+    hum_text_group.append(hum_text_area)
 
     # Display Baro
     baro_text = "Baro: " + str(round((current_wx['main']['pressure'] * 0.02961),2))
     baro_text_area = label.Label(font, text=baro_text, color=color_white)
     baro_text_area.x = 180
     baro_text_area.y = 150
-    text8_group = displayio.Group()
-    text8_group.append(baro_text_area)
+    baro_text_group = displayio.Group()
+    baro_text_group.append(baro_text_area)
 
     # Display City Name
     city_text = "Conditions at " + current_wx['name']
     city_text_area = label.Label(font, text=city_text, color=color_white)
     city_text_area.x = 10
     city_text_area.y = 10
-    text5_group = displayio.Group()
-    text5_group.append(city_text_area)
+    city_text_group = displayio.Group()
+    city_text_group.append(city_text_area)
 
     # Display Current Conditions
     cur_conditions_text = current_wx['weather'][0]['description']
     cur_conditions_text_area = label.Label(font, text=cur_conditions_text, color=color_white)
     cur_conditions_text_area.x = 10
     cur_conditions_text_area.y = 30
-    text6_group = displayio.Group()
-    text6_group.append(cur_conditions_text_area)
+    cur_conditions_text_group = displayio.Group()
+    cur_conditions_text_group.append(cur_conditions_text_area)
 
     # Set Background Colors
     background1 = Rect(0, 0, 340, 45, fill=color_purple)
@@ -221,20 +221,21 @@ while True:
     icon_tilegrid.x = 20
     icon_tilegrid.y = 45
 
-    # Show everything on screen.
+    # Package up all the groups to pass to the display.
     group = displayio.Group(max_size=11)
     group.append(background1)
     group.append(background2)
     group.append(icon_tilegrid)
-    group.append(text1_group)
-    group.append(text2_group)
-    group.append(text7_group)
-    group.append(text8_group)
-    group.append(text3_group)
-    group.append(text4_group)
-    group.append(text5_group)
-    group.append(text6_group)
+    group.append(wind_text_group)
+    group.append(time_text_group)
+    group.append(hum_text_group)
+    group.append(baro_text_group)
+    group.append(date_text_group)
+    group.append(temp_out_text_group)
+    group.append(city_text_group)
+    group.append(cur_conditions_text_group)
 
+    # Output to Screen
     display.show(group)
 
     # Our Screen Refresh Rate
