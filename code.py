@@ -4,7 +4,6 @@ import board
 import busio
 import neopixel
 import rtc # For interfacing with the Real Time Clock
-import terminalio  # For using the terminal basic font
 import displayio # Library for writing text / graphics to the screen
 import adafruit_adt7410  # For polling the onboard 7410 Temp Sensor
 from adafruit_display_shapes.rect import Rect # Library to draw rectangles
@@ -13,13 +12,11 @@ from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text import label
 from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
 
-cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
-
-# Get wifi details and more from a secrets.py file
+# Get wifi and api secrets
 try:
     from secrets import secrets
 except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
+    print("Error: Could not load secrets from secrets.py")
     raise
 
 # PyPortal ESP32 Setup
@@ -37,13 +34,12 @@ adt = adafruit_adt7410.ADT7410(i2c_bus, address=0x48)
 adt.high_resolution = True
 
 # Initialize the Real Time Clock
-the_rtc = rtc.RTC()
+internal_rtc = rtc.RTC()
 
 # Initialize the Display
 display = board.DISPLAY
 
 # Set some Global variables
-time_api = "http://worldtimeapi.org/api/ip"
 font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
 color_blue = 0x0000FF
 color_white = 0xFFFFFF
@@ -54,35 +50,34 @@ color_darkblue = 0x00004a
 print("Initializing")
 wifi.connect()
 
-def sync_rtc(time_api):
+def sync_rtc():
     # Get the time from the time api server. 
+    poll_URL = "http://worldtimeapi.org/api/ip"
+
     response = None
     while True:
         try:
-            print("Fetching time from", time_api)
-            response = wifi.get(time_api)
+            print("Fetching time from", poll_URL)
+            response = wifi.get(poll_URL)
             break
         except (ValueError, RuntimeError) as e:
             print("Failed to get data, retrying\n", e)
             continue
 
     # Parse the time out of the API Response
-    json = response.json()
-    current_time = json['datetime']
+    time_json = response.json()
+    current_time = time_json['datetime']
     the_date, the_time = current_time.split('T')
     year, month, mday = [int(x) for x in the_date.split('-')]
     the_time = the_time.split('.')[0]
     hours, minutes, seconds = [int(x) for x in the_time.split(':')]
-    year_day = json['day_of_year']
-    week_day = json['day_of_week']
-    is_dst = json['dst']
 
     # Update the RTC
-    now = time.struct_time((year, month, mday, hours, minutes, seconds, week_day, year_day, is_dst))
-    print(now)
-    the_rtc.datetime = now
+    now = time.struct_time((year, month, mday, hours, minutes, seconds, time_json['day_of_week'], time_json['day_of_year'], time_json['dst']))
+    internal_rtc.datetime = now
 
 def get_current_wx(cityid, api_key):
+    # Get the current condtions from the weather API server
     poll_URL = "https://api.openweathermap.org/data/2.5/weather?id=" + cityid + "&units=imperial&appid=" + api_key 
 
     response = None
@@ -95,8 +90,8 @@ def get_current_wx(cityid, api_key):
             print("Failed to get data, retrying\n", e)
             continue
 
-    json = response.json()
-    return json
+    weather_json = response.json()
+    return weather_json
 
 def get_temp_in():
     temperature = adt.temperature
@@ -109,7 +104,7 @@ def degree_to_cardinal(wind_degrees):
     compass=["N","NNE","NE","ENE","E","ESE", "SE", "SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
     return compass[(val % 16)]
 
-sync_rtc(time_api)
+sync_rtc()
 temp_in = get_temp_in()
 current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 
@@ -125,9 +120,9 @@ while True:
 
     # Resync the clock at 11 min past the hour.  
     if ((now[4] == 11) and (now[5] == 0)):
-        sync_rtc(time_api)
+        sync_rtc()
 
-    # Resync the weather every 10 min.
+    # Resync the current weather conditions every 10 min.
     if (now[4] % 10 == 0) and (now[5] == 0):
         current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
     
@@ -174,15 +169,14 @@ while True:
     text4_group = displayio.Group()
     text4_group.append(temp_out_text_area)
 
-    wind_dir = degree_to_cardinal(current_wx['wind']['deg'])
-
     # Display Wind
-    wind_in_text = "Wind: " + str(round(current_wx['wind']['speed'],0)) + " " + wind_dir
-    wind_in_text_area = label.Label(font, text=wind_in_text, color=color_white)
-    wind_in_text_area.x = 180
-    wind_in_text_area.y = 110
+    wind_dir = degree_to_cardinal(current_wx['wind']['deg'])
+    wind_text = "Wind: " + str(round(current_wx['wind']['speed'],0)) + " " + wind_dir
+    wind_text_area = label.Label(font, text=wind_text, color=color_white)
+    wind_text_area.x = 180
+    wind_text_area.y = 110
     text1_group = displayio.Group()
-    text1_group.append(wind_in_text_area)
+    text1_group.append(wind_text_area)
 
     # Display Humidity
     hum_text = "Hum: " + str(round(current_wx['main']['humidity'],1)) + "%"
@@ -200,38 +194,38 @@ while True:
     text8_group = displayio.Group()
     text8_group.append(baro_text_area)
 
-
-    # Current Conditions
-    city_out_text = "Conditions at " + current_wx['name']
-    city_out_text_area = label.Label(font, text=city_out_text, color=color_white)
-    city_out_text_area.x = 10
-    city_out_text_area.y = 10
+    # Display City Name
+    city_text = "Conditions at " + current_wx['name']
+    city_text_area = label.Label(font, text=city_text, color=color_white)
+    city_text_area.x = 10
+    city_text_area.y = 10
     text5_group = displayio.Group()
-    text5_group.append(city_out_text_area)
+    text5_group.append(city_text_area)
 
-    # Display Conditions
-    conditions_out_text = current_wx['weather'][0]['description']
-    conditions_out_text_area = label.Label(font, text=conditions_out_text, color=color_white)
-    conditions_out_text_area.x = 10
-    conditions_out_text_area.y = 30
+    # Display Current Conditions
+    cur_conditions_text = current_wx['weather'][0]['description']
+    cur_conditions_text_area = label.Label(font, text=cur_conditions_text, color=color_white)
+    cur_conditions_text_area.x = 10
+    cur_conditions_text_area.y = 30
     text6_group = displayio.Group()
-    text6_group.append(conditions_out_text_area)
+    text6_group.append(cur_conditions_text_area)
 
-    bg1_group = Rect(0, 0, 340, 45, fill=color_purple)
-    bg2_group = Rect(0, 45, 340, 300, fill=color_darkblue)
+    # Set Background Colors
+    background1 = Rect(0, 0, 340, 45, fill=color_purple)
+    background2 = Rect(0, 45, 340, 300, fill=color_darkblue)
 
     # Weather Conditions Icon
     icon_path = "/icons/" + current_wx['weather'][0]['icon'] + ".bmp"
-    my_bitmap = displayio.OnDiskBitmap(open(icon_path, "rb"))
-    my_tilegrid = displayio.TileGrid(my_bitmap, pixel_shader=displayio.ColorConverter())
-    my_tilegrid.x = 20
-    my_tilegrid.y = 45
+    icon_bitmap = displayio.OnDiskBitmap(open(icon_path, "rb"))
+    icon_tilegrid = displayio.TileGrid(icon_bitmap, pixel_shader=displayio.ColorConverter())
+    icon_tilegrid.x = 20
+    icon_tilegrid.y = 45
 
     # Show everything on screen.
     group = displayio.Group(max_size=11)
-    group.append(bg1_group)
-    group.append(bg2_group)
-    group.append(my_tilegrid)
+    group.append(background1)
+    group.append(background2)
+    group.append(icon_tilegrid)
     group.append(text1_group)
     group.append(text2_group)
     group.append(text7_group)
