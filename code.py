@@ -125,13 +125,12 @@ def get_forecast_for_day(forecast_data, day_num):
     forecast_temps = []
     for item in forecast_data['list']:
         forecast_time = time.localtime(item['dt'])
-        #print(item['dt'])
 
         if forecast_time[6] == day_num:
-            #print(forecast_time[6])
-            #print(item['main']['temp'])
             forecast_temps.append(item['main']['temp'])
     forecast_for_day = {'forecast_temps' : forecast_temps}
+    forecast_for_day.update({'forecast_high' : max(forecast_temps)})
+    forecast_for_day.update({'forecast_low' : min(forecast_temps)})
     return forecast_for_day
 
 sync_rtc()
@@ -139,8 +138,11 @@ temp_in = get_temp_in()
 current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 
-forecast = get_forecast_for_day(forecast_wx, 1)
+now = time.localtime()
+forecast = get_forecast_for_day(forecast_wx, 2)
 print(forecast['forecast_temps'])
+print(forecast['forecast_high'])
+print(forecast['forecast_low'])
 
 time.sleep(10)
 
