@@ -121,14 +121,26 @@ def degree_to_cardinal(wind_degrees):
     compass=["N","NNE","NE","ENE","E","ESE", "SE", "SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
     return compass[(val % 16)]
 
+def get_forecast_for_day(forecast_data, day_num):
+    forecast_temps = []
+    for item in forecast_data['list']:
+        forecast_time = time.localtime(item['dt'])
+        #print(item['dt'])
+
+        if forecast_time[6] == day_num:
+            #print(forecast_time[6])
+            #print(item['main']['temp'])
+            forecast_temps.append(item['main']['temp'])
+    forecast_for_day = {'forecast_temps' : forecast_temps}
+    return forecast_for_day
+
 sync_rtc()
 temp_in = get_temp_in()
 current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 
-for item in forecast_wx['list']:
-    print(item['dt'])
-    print(item['main']['temp'])
+forecast = get_forecast_for_day(forecast_wx, 1)
+print(forecast['forecast_temps'])
 
 time.sleep(10)
 
