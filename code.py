@@ -125,7 +125,7 @@ def get_forecast_for_day(forecast_data, day_num):
     forecast_temps = []
     if day_num == 7:
         day_num = 0
-    elif daynum == 8:
+    elif day_num == 8:
         day_num = 1
     elif day_num == 9:
         day_num = 2
@@ -184,80 +184,45 @@ while True:
     else:
         time_hour = str(now[3])
 
-    # Display Time
+    # Display Time and Date
     timenow = time_hour + ":" + str("{:02d}".format(now[4])) + ":" + str("{:02d}".format(now[5])) + " " + time_tag
-    time_text = timenow
-    time_text_area = label.Label(font, text=time_text, color=color_white)
-    time_text_area.x = 220
-    time_text_area.y = 10
-    time_text_group = displayio.Group()
-    time_text_group.append(time_text_area)
-
-    # Display Date
     day_name = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat','Sun']
     month_name = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     day_name = day_name[now[6]]
     month_name = month_name[now[1] - 1]
     datenow = day_name + " " + month_name + " " + str(now[2])
-    date_text = datenow
-    date_text_area = label.Label(font, text=date_text, color=color_white)
-    date_text_area.x = 220
-    date_text_area.y = 30
-    date_text_group = displayio.Group()
-    date_text_group.append(date_text_area)
-
-    # Display Outdoor Temp
-    temp_out_text = "Temp Out: " + str(round(current_wx['main']['temp'],1))
-    temp_out_text_area = label.Label(font, text=temp_out_text, color=color_white)
-    temp_out_text_area.x = 180
-    temp_out_text_area.y = 90
-    temp_out_text_group = displayio.Group()
-    temp_out_text_group.append(temp_out_text_area)
-
-    # Display Wind
-    wind_dir = degree_to_cardinal(current_wx['wind']['deg'])
-    wind_text = "Wind: " + str(round(current_wx['wind']['speed'],0)) + " " + wind_dir
-    wind_text_area = label.Label(font, text=wind_text, color=color_white)
-    wind_text_area.x = 180
-    wind_text_area.y = 110
-    wind_text_group = displayio.Group()
-    wind_text_group.append(wind_text_area)
-
-    # Display Humidity
-    hum_text = "Hum: " + str(round(current_wx['main']['humidity'],1)) + "%"
-    hum_text_area = label.Label(font, text=hum_text, color=color_white)
-    hum_text_area.x = 180
-    hum_text_area.y = 130
-    hum_text_group = displayio.Group()
-    hum_text_group.append(hum_text_area)
-
-    # Display Baro
-    baro_text = "Baro: " + str(round((current_wx['main']['pressure'] * 0.02961),2))
-    baro_text_area = label.Label(font, text=baro_text, color=color_white)
-    baro_text_area.x = 180
-    baro_text_area.y = 150
-    baro_text_group = displayio.Group()
-    baro_text_group.append(baro_text_area)
-
-    # Display City Name
-    city_text = "Conditions at " + current_wx['name']
-    city_text_area = label.Label(font, text=city_text, color=color_white)
-    city_text_area.x = 10
-    city_text_area.y = 10
-    city_text_group = displayio.Group()
-    city_text_group.append(city_text_area)
+    time_text = timenow + "\n" + datenow
+    time_text_area = label.Label(font, text=time_text, color=color_white, line_spacing=0.8)
+    time_text_area.x = 220
+    time_text_area.y = 20
+    time_text_group = displayio.Group()
+    time_text_group.append(time_text_area)
 
     # Display Current Conditions
-    cur_conditions_text = current_wx['weather'][0]['description']
-    cur_conditions_text_area = label.Label(font, text=cur_conditions_text, color=color_white)
-    cur_conditions_text_area.x = 10
-    cur_conditions_text_area.y = 30
+    temp_out = "Temp Out: " + str(round(current_wx['main']['temp']))
+    wind_dir = "Wind: " + str(round(current_wx['wind']['speed'])) + " " + degree_to_cardinal(current_wx['wind']['deg'])
+    hum_out = "Hum: " + str(round(current_wx['main']['humidity'],1)) + "%"
+    baro_out = "Baro: " + str(round((current_wx['main']['pressure'] * 0.02961),2))
+
+    cur_conditions_text = temp_out + "\n" + wind_dir +"\n" + hum_out + "\n" + baro_out
+    cur_conditions_text_area = label.Label(font, text=cur_conditions_text, color=color_white, line_spacing=0.8)
+    cur_conditions_text_area.x = 180
+    cur_conditions_text_area.y = 110
     cur_conditions_text_group = displayio.Group()
     cur_conditions_text_group.append(cur_conditions_text_area)
 
-    day_name_forecast = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed']
+    # Display City Name and Current Conditions
+    city_text = "Conditions at " + current_wx['name'] + "\n" + current_wx['weather'][0]['description']
+    city_text_area = label.Label(font, text=city_text, color=color_white, line_spacing=0.8)
+    city_text_area.x = 10
+    city_text_area.y = 20
+    city_text_group = displayio.Group()
+    city_text_group.append(city_text_area)
 
     # Display Day 1 Forecast
+
+    day_name_forecast = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed']
+
     day1_forecast_text = day_name_forecast[now[6] + 1] + "\r\nH: " + str(day1_forecast['forecast_high']) + "\r\nL: " + str(day1_forecast['forecast_low'])
     day1_forecast_text_area = label.Label(font, text=day1_forecast_text, color=color_white, line_spacing=0.8)
     day1_forecast_text_area.x = 20
@@ -277,18 +242,13 @@ while True:
     icon_tilegrid.y = 45
 
     # Package up all the groups to pass to the display.
-    group = displayio.Group(max_size=12)
+    group = displayio.Group(max_size=8)
     group.append(background1)
     group.append(background2)
     group.append(icon_tilegrid)
-    group.append(wind_text_group)
     group.append(time_text_group)
-    group.append(hum_text_group)
-    group.append(baro_text_group)
-    group.append(date_text_group)
-    group.append(temp_out_text_group)
-    group.append(city_text_group)
     group.append(cur_conditions_text_group)
+    group.append(city_text_group)
     group.append(day1_forecast_text_group)
 
     # Output to Screen
