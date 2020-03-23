@@ -5,7 +5,7 @@ import busio
 import neopixel
 import rtc # For interfacing with the Real Time Clock
 import displayio # Library for writing text / graphics to the screen
-import adafruit_adt7410  # For polling the onboard 7410 Temp Sensor
+#import adafruit_adt7410  # For polling the onboard 7410 Temp Sensor
 from adafruit_display_shapes.rect import Rect # Library to draw rectangles
 from digitalio import DigitalInOut # Enabling DigitalIO so we can talk to the ESP32 Wifi chip.
 from adafruit_bitmap_font import bitmap_font
@@ -28,10 +28,10 @@ esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 
-# Initialize the ADT7410 Temp Sensor
-i2c_bus = busio.I2C(board.SCL, board.SDA)
-adt = adafruit_adt7410.ADT7410(i2c_bus, address=0x48)
-adt.high_resolution = True
+# # Initialize the ADT7410 Temp Sensor
+# i2c_bus = busio.I2C(board.SCL, board.SDA)
+# adt = adafruit_adt7410.ADT7410(i2c_bus, address=0x48)
+# adt.high_resolution = True
 
 # Initialize the Real Time Clock
 internal_rtc = rtc.RTC()
@@ -123,26 +123,30 @@ def degree_to_cardinal(wind_degrees):
 
 def get_forecast_for_day(forecast_data, day_num):
     forecast_temps = []
+    if day_num == 7:
+        day_num = 0
+    elif daynum == 8:
+        day_num = 1
+    elif day_num == 9:
+        day_num = 2
+    
     for item in forecast_data['list']:
         forecast_time = time.localtime(item['dt'])
 
         if forecast_time[6] == day_num:
             forecast_temps.append(item['main']['temp'])
     forecast_for_day = {'forecast_temps' : forecast_temps}
-    forecast_for_day.update({'forecast_high' : max(forecast_temps)})
-    forecast_for_day.update({'forecast_low' : min(forecast_temps)})
+    forecast_for_day.update({'forecast_high' : round(max(forecast_temps))})
+    forecast_for_day.update({'forecast_low' : round(min(forecast_temps))})
     return forecast_for_day
 
 sync_rtc()
-temp_in = get_temp_in()
+#temp_in = get_temp_in()
 current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 
 now = time.localtime()
-forecast = get_forecast_for_day(forecast_wx, 2)
-print(forecast['forecast_temps'])
-print(forecast['forecast_high'])
-print(forecast['forecast_low'])
+day1_forecast = get_forecast_for_day(forecast_wx, now[6] + 1)
 
 time.sleep(10)
 
@@ -150,13 +154,18 @@ while True:
     # Load the current time from the RTC
     now = time.localtime()
 
-    # Update the internal temp only once per min at 10 seconds past. 
-    if (now[5] == 10):
-        temp_in = get_temp_in()
+    # # Update the internal temp only once per min at 10 seconds past. 
+    # if (now[5] == 10):
+    #     temp_in = get_temp_in()
 
     # Resync the clock at 11 min past the hour.  
     if ((now[4] == 11) and (now[5] == 0)):
         sync_rtc()
+
+    # Resync the forecast at 15 min past the hour.  
+    if ((now[4] == 15) and (now[5] == 0)):
+        forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
+        day1_forecast = get_forecast_for_day(forecast_wx, now[6] + 1)
 
     # Resync the current weather conditions every 10 min.
     if (now[4] % 10 == 0) and (now[5] == 0):
@@ -246,6 +255,16 @@ while True:
     cur_conditions_text_group = displayio.Group()
     cur_conditions_text_group.append(cur_conditions_text_area)
 
+    day_name_forecast = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed']
+
+    # Display Day 1 Forecast
+    day1_forecast_text = day_name_forecast[now[6] + 1] + "\r\nH: " + str(day1_forecast['forecast_high']) + "\r\nL: " + str(day1_forecast['forecast_low'])
+    day1_forecast_text_area = label.Label(font, text=day1_forecast_text, color=color_white, line_spacing=0.8)
+    day1_forecast_text_area.x = 20
+    day1_forecast_text_area.y = 190
+    day1_forecast_text_group = displayio.Group()
+    day1_forecast_text_group.append(day1_forecast_text_area)
+
     # Set Background Colors
     background1 = Rect(0, 0, 340, 45, fill=color_purple)
     background2 = Rect(0, 45, 340, 300, fill=color_darkblue)
@@ -258,7 +277,7 @@ while True:
     icon_tilegrid.y = 45
 
     # Package up all the groups to pass to the display.
-    group = displayio.Group(max_size=11)
+    group = displayio.Group(max_size=12)
     group.append(background1)
     group.append(background2)
     group.append(icon_tilegrid)
@@ -270,6 +289,7 @@ while True:
     group.append(temp_out_text_group)
     group.append(city_text_group)
     group.append(cur_conditions_text_group)
+    group.append(day1_forecast_text_group)
 
     # Output to Screen
     display.show(group)
