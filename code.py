@@ -3,6 +3,7 @@ import time
 import board
 import busio
 import neopixel
+import gc
 import rtc # For interfacing with the Real Time Clock
 import displayio # Library for writing text / graphics to the screen
 #import adafruit_adt7410  # For polling the onboard 7410 Temp Sensor
@@ -140,6 +141,7 @@ def get_forecast_for_day(forecast_data, day_num):
     forecast_for_day.update({'forecast_low' : round(min(forecast_temps))})
     return forecast_for_day
 
+print("Mem Free: " + str(gc.mem_free()))
 sync_rtc()
 #temp_in = get_temp_in()
 current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
@@ -147,6 +149,9 @@ forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 
 now = time.localtime()
 day1_forecast = get_forecast_for_day(forecast_wx, now[6] + 1)
+forecast_wx = None
+
+print("Mem Free: " + str(gc.mem_free()))
 
 time.sleep(10)
 
@@ -163,9 +168,10 @@ while True:
         sync_rtc()
 
     # Resync the forecast at 15 min past the hour.  
-    if ((now[4] == 15) and (now[5] == 0)):
+    if ((now[4] == 15) and (now[5] == 30)):
         forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
         day1_forecast = get_forecast_for_day(forecast_wx, now[6] + 1)
+        forecast_wx = None
 
     # Resync the current weather conditions every 10 min.
     if (now[4] % 10 == 0) and (now[5] == 0):
@@ -230,6 +236,14 @@ while True:
     day1_forecast_text_group = displayio.Group()
     day1_forecast_text_group.append(day1_forecast_text_area)
 
+    # Display Free Mem for Debugging 
+    mem_text = "Mem: " + str(gc.mem_free())
+    mem_text_area = label.Label(font, text=mem_text, color=color_white, line_spacing=0.8)
+    mem_text_area.x = 200
+    mem_text_area.y = 230
+    mem_text_group = displayio.Group()
+    mem_text_group.append(mem_text_area)
+
     # Set Background Colors
     background1 = Rect(0, 0, 340, 45, fill=color_purple)
     background2 = Rect(0, 45, 340, 300, fill=color_darkblue)
@@ -245,6 +259,7 @@ while True:
     group = displayio.Group(max_size=8)
     group.append(background1)
     group.append(background2)
+    group.append(mem_text_group)
     group.append(icon_tilegrid)
     group.append(time_text_group)
     group.append(cur_conditions_text_group)
