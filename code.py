@@ -6,7 +6,6 @@ import neopixel
 import gc
 import rtc # For interfacing with the Real Time Clock
 import displayio # Library for writing text / graphics to the screen
-#import adafruit_adt7410  # For polling the onboard 7410 Temp Sensor
 from adafruit_display_shapes.rect import Rect # Library to draw rectangles
 from digitalio import DigitalInOut # Enabling DigitalIO so we can talk to the ESP32 Wifi chip.
 from adafruit_bitmap_font import bitmap_font
@@ -29,11 +28,6 @@ esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 status_light = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=0.2)
 wifi = adafruit_esp32spi_wifimanager.ESPSPI_WiFiManager(esp, secrets, status_light)
 
-# # Initialize the ADT7410 Temp Sensor
-# i2c_bus = busio.I2C(board.SCL, board.SDA)
-# adt = adafruit_adt7410.ADT7410(i2c_bus, address=0x48)
-# adt.high_resolution = True
-
 # Initialize the Real Time Clock
 internal_rtc = rtc.RTC()
 
@@ -51,9 +45,9 @@ color_darkblue = 0x00004a
 print("Initializing")
 wifi.connect()
 
-def sync_rtc():
+def sync_rtc(time_api):
     # Get the time from the time api server. 
-    poll_URL = "http://worldtimeapi.org/api/ip"
+    poll_URL = time_api
 
     response = None
     while True:
@@ -111,11 +105,6 @@ def get_forecast_wx(cityid, api_key):
     forecast_json = response.json()
     return forecast_json
 
-def get_temp_in():
-    temperature = adt.temperature
-    temperature = round((temperature * 1.8 +32),1)
-    return temperature
-
 def degree_to_cardinal(wind_degrees):
     # Wind Degrees to Cardinal solution from https://stackoverflow.com/questions/7490660/converting-wind-direction-in-angles-to-text-words
     val=int((wind_degrees/22.5)+.5)
@@ -142,8 +131,7 @@ def get_forecast_for_day(forecast_data, day_num):
     return forecast_for_day
 
 print("Mem Free: " + str(gc.mem_free()))
-sync_rtc()
-#temp_in = get_temp_in()
+sync_rtc(secrets['time_api'])
 current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 
@@ -159,13 +147,9 @@ while True:
     # Load the current time from the RTC
     now = time.localtime()
 
-    # # Update the internal temp only once per min at 10 seconds past. 
-    # if (now[5] == 10):
-    #     temp_in = get_temp_in()
-
     # Resync the clock at 11 min past the hour.  
     if ((now[4] == 11) and (now[5] == 0)):
-        sync_rtc()
+        sync_rtc(secrets['time_api'])
 
     # Resync the forecast at 15 min past the hour.  
     if ((now[4] == 15) and (now[5] == 30)):
@@ -226,9 +210,7 @@ while True:
     city_text_group.append(city_text_area)
 
     # Display Day 1 Forecast
-
     day_name_forecast = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed']
-
     day1_forecast_text = day_name_forecast[now[6] + 1] + "\r\nH: " + str(day1_forecast['forecast_high']) + "\r\nL: " + str(day1_forecast['forecast_low'])
     day1_forecast_text_area = label.Label(font, text=day1_forecast_text, color=color_white, line_spacing=0.8)
     day1_forecast_text_area.x = 20
@@ -269,5 +251,8 @@ while True:
     # Output to Screen
     display.show(group)
 
+    #Run Garbage Collection
+    gc.collect()
+
     # Our Screen Refresh Rate
-    time.sleep(0.5)
+    time.sleep(1)
