@@ -137,6 +137,8 @@ forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
 
 now = time.localtime()
 day1_forecast = get_forecast_for_day(forecast_wx, now[6] + 1)
+day2_forecast = get_forecast_for_day(forecast_wx, now[6] + 2)
+day3_forecast = get_forecast_for_day(forecast_wx, now[6] + 3)
 forecast_wx = None
 
 print("Mem Free: " + str(gc.mem_free()))
@@ -155,6 +157,8 @@ while True:
     if ((now[4] == 15) and (now[5] == 30)):
         forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
         day1_forecast = get_forecast_for_day(forecast_wx, now[6] + 1)
+        day2_forecast = get_forecast_for_day(forecast_wx, now[6] + 2)
+        day3_forecast = get_forecast_for_day(forecast_wx, now[6] + 3)
         forecast_wx = None
 
     # Resync the current weather conditions every 10 min.
@@ -189,14 +193,14 @@ while True:
     time_text_group.append(time_text_area)
 
     # Display Current Conditions
-    temp_out = "Temp Out: " + str(round(current_wx['main']['temp']))
+    temp_out = "Temp: " + str(round(current_wx['main']['temp'])) + "°"
     wind_dir = "Wind: " + str(round(current_wx['wind']['speed'])) + " " + degree_to_cardinal(current_wx['wind']['deg'])
     hum_out = "Hum: " + str(round(current_wx['main']['humidity'],1)) + "%"
     baro_out = "Baro: " + str(round((current_wx['main']['pressure'] * 0.02961),2))
 
     cur_conditions_text = temp_out + "\n" + wind_dir +"\n" + hum_out + "\n" + baro_out
     cur_conditions_text_area = label.Label(font, text=cur_conditions_text, color=color_white, line_spacing=0.8)
-    cur_conditions_text_area.x = 180
+    cur_conditions_text_area.x = 190
     cur_conditions_text_area.y = 110
     cur_conditions_text_group = displayio.Group()
     cur_conditions_text_group.append(cur_conditions_text_area)
@@ -211,12 +215,28 @@ while True:
 
     # Display Day 1 Forecast
     day_name_forecast = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed']
-    day1_forecast_text = day_name_forecast[now[6] + 1] + "\r\nH: " + str(day1_forecast['forecast_high']) + "\r\nL: " + str(day1_forecast['forecast_low'])
+    day1_forecast_text = day_name_forecast[now[6] + 1] + "\r\nH: " + str(day1_forecast['forecast_high']) + "°\r\nL: " + str(day1_forecast['forecast_low']) + "°"
     day1_forecast_text_area = label.Label(font, text=day1_forecast_text, color=color_white, line_spacing=0.8)
     day1_forecast_text_area.x = 20
-    day1_forecast_text_area.y = 190
+    day1_forecast_text_area.y = 200
     day1_forecast_text_group = displayio.Group()
     day1_forecast_text_group.append(day1_forecast_text_area)
+
+    # Display Day 2 Forecast
+    day2_forecast_text = day_name_forecast[now[6] + 2] + "\r\nH: " + str(day2_forecast['forecast_high']) + "°\r\nL: " + str(day2_forecast['forecast_low']) + "°"
+    day2_forecast_text_area = label.Label(font, text=day2_forecast_text, color=color_white, line_spacing=0.8)
+    day2_forecast_text_area.x = 80
+    day2_forecast_text_area.y = 200
+    day2_forecast_text_group = displayio.Group()
+    day2_forecast_text_group.append(day2_forecast_text_area)
+
+    # Display Day 3 Forecast
+    day3_forecast_text = day_name_forecast[now[6] + 3] + "\r\nH: " + str(day3_forecast['forecast_high']) + "°\r\nL: " + str(day3_forecast['forecast_low']) + "°"
+    day3_forecast_text_area = label.Label(font, text=day3_forecast_text, color=color_white, line_spacing=0.8)
+    day3_forecast_text_area.x = 140
+    day3_forecast_text_area.y = 200
+    day3_forecast_text_group = displayio.Group()
+    day3_forecast_text_group.append(day3_forecast_text_area)
 
     # Display Free Mem for Debugging 
     mem_text = "Mem: " + str(gc.mem_free())
@@ -235,18 +255,20 @@ while True:
     icon_bitmap = displayio.OnDiskBitmap(open(icon_path, "rb"))
     icon_tilegrid = displayio.TileGrid(icon_bitmap, pixel_shader=displayio.ColorConverter())
     icon_tilegrid.x = 20
-    icon_tilegrid.y = 45
+    icon_tilegrid.y = 35
 
     # Package up all the groups to pass to the display.
-    group = displayio.Group(max_size=8)
-    group.append(background1)
+    group = displayio.Group(max_size=10)
     group.append(background2)
-    group.append(mem_text_group)
     group.append(icon_tilegrid)
+    group.append(background1)
+    #group.append(mem_text_group)
     group.append(time_text_group)
     group.append(cur_conditions_text_group)
     group.append(city_text_group)
     group.append(day1_forecast_text_group)
+    group.append(day2_forecast_text_group)
+    group.append(day3_forecast_text_group)
 
     # Output to Screen
     display.show(group)
