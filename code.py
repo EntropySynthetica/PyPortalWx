@@ -35,7 +35,8 @@ internal_rtc = rtc.RTC()
 display = board.DISPLAY
 
 # Set some Global variables
-font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
+#font = bitmap_font.load_font("/fonts/Arial-ItalicMT-17.bdf")
+font = bitmap_font.load_font("/fonts/Helvetica-Bold-16.bdf")
 color_blue = 0x0000FF
 color_white = 0xFFFFFF
 color_darkpurple = 0x2e0142
@@ -187,7 +188,7 @@ while True:
     month_name = month_name[now[1] - 1]
     datenow = day_name + " " + month_name + " " + str(now[2])
     time_text = timenow + "\n" + datenow
-    time_text_area = label.Label(font, text=time_text, color=color_white, line_spacing=0.8)
+    time_text_area = label.Label(font, text=time_text, color=color_white, line_spacing=0.9)
     time_text_area.x = 220
     time_text_area.y = 20
     time_text_group = displayio.Group()
@@ -200,7 +201,7 @@ while True:
     baro_out = "Baro: " + str(round((current_wx['main']['pressure'] * 0.02961),2))
 
     cur_conditions_text = temp_out + "\n" + wind_dir +"\n" + hum_out + "\n" + baro_out
-    cur_conditions_text_area = label.Label(font, text=cur_conditions_text, color=color_white, line_spacing=0.8)
+    cur_conditions_text_area = label.Label(font, text=cur_conditions_text, color=color_white, line_spacing=0.9)
     cur_conditions_text_area.x = 190
     cur_conditions_text_area.y = 110
     cur_conditions_text_group = displayio.Group()
@@ -208,7 +209,7 @@ while True:
 
     # Display City Name and Current Conditions
     city_text = "Conditions at " + current_wx['name'] + "\n" + current_wx['weather'][0]['description']
-    city_text_area = label.Label(font, text=city_text, color=color_white, line_spacing=0.8)
+    city_text_area = label.Label(font, text=city_text, color=color_white, line_spacing=0.9)
     city_text_area.x = 10
     city_text_area.y = 20
     city_text_group = displayio.Group()
@@ -217,7 +218,7 @@ while True:
     # Display Day 1 Forecast
     day_name_forecast = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed']
     day1_forecast_text = day_name_forecast[now[6] + 1] + "\r\nH: " + str(day1_forecast['forecast_high']) + "°\r\nL: " + str(day1_forecast['forecast_low']) + "°"
-    day1_forecast_text_area = label.Label(font, text=day1_forecast_text, color=color_white, line_spacing=0.8)
+    day1_forecast_text_area = label.Label(font, text=day1_forecast_text, color=color_white, line_spacing=0.9)
     day1_forecast_text_area.x = 20
     day1_forecast_text_area.y = 200
     day1_forecast_text_group = displayio.Group()
@@ -225,7 +226,7 @@ while True:
 
     # Display Day 2 Forecast
     day2_forecast_text = day_name_forecast[now[6] + 2] + "\r\nH: " + str(day2_forecast['forecast_high']) + "°\r\nL: " + str(day2_forecast['forecast_low']) + "°"
-    day2_forecast_text_area = label.Label(font, text=day2_forecast_text, color=color_white, line_spacing=0.8)
+    day2_forecast_text_area = label.Label(font, text=day2_forecast_text, color=color_white, line_spacing=0.9)
     day2_forecast_text_area.x = 130
     day2_forecast_text_area.y = 200
     day2_forecast_text_group = displayio.Group()
@@ -233,7 +234,7 @@ while True:
 
     # Display Day 3 Forecast
     day3_forecast_text = day_name_forecast[now[6] + 3] + "\r\nH: " + str(day3_forecast['forecast_high']) + "°\r\nL: " + str(day3_forecast['forecast_low']) + "°"
-    day3_forecast_text_area = label.Label(font, text=day3_forecast_text, color=color_white, line_spacing=0.8)
+    day3_forecast_text_area = label.Label(font, text=day3_forecast_text, color=color_white, line_spacing=0.9)
     day3_forecast_text_area.x = 240
     day3_forecast_text_area.y = 200
     day3_forecast_text_group = displayio.Group()
@@ -241,7 +242,7 @@ while True:
 
     # Display Free Mem for Debugging 
     mem_text = "Mem: " + str(gc.mem_free())
-    mem_text_area = label.Label(font, text=mem_text, color=color_white, line_spacing=0.8)
+    mem_text_area = label.Label(font, text=mem_text, color=color_white, line_spacing=0.9)
     mem_text_area.x = 200
     mem_text_area.y = 230
     mem_text_group = displayio.Group()
