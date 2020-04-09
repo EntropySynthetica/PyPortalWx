@@ -125,6 +125,7 @@ def get_forecast_for_day(forecast_data, day_num):
 
         if forecast_time[6] == day_num:
             forecast_temps.append(item['main']['temp'])
+
     forecast_for_day = {'forecast_temps' : forecast_temps}
     forecast_for_day.update({'forecast_high' : round(max(forecast_temps))})
     forecast_for_day.update({'forecast_low' : round(min(forecast_temps))})
@@ -225,7 +226,7 @@ while True:
     # Display Day 2 Forecast
     day2_forecast_text = day_name_forecast[now[6] + 2] + "\r\nH: " + str(day2_forecast['forecast_high']) + "°\r\nL: " + str(day2_forecast['forecast_low']) + "°"
     day2_forecast_text_area = label.Label(font, text=day2_forecast_text, color=color_white, line_spacing=0.8)
-    day2_forecast_text_area.x = 80
+    day2_forecast_text_area.x = 130
     day2_forecast_text_area.y = 200
     day2_forecast_text_group = displayio.Group()
     day2_forecast_text_group.append(day2_forecast_text_area)
@@ -233,7 +234,7 @@ while True:
     # Display Day 3 Forecast
     day3_forecast_text = day_name_forecast[now[6] + 3] + "\r\nH: " + str(day3_forecast['forecast_high']) + "°\r\nL: " + str(day3_forecast['forecast_low']) + "°"
     day3_forecast_text_area = label.Label(font, text=day3_forecast_text, color=color_white, line_spacing=0.8)
-    day3_forecast_text_area.x = 140
+    day3_forecast_text_area.x = 240
     day3_forecast_text_area.y = 200
     day3_forecast_text_group = displayio.Group()
     day3_forecast_text_group.append(day3_forecast_text_area)
