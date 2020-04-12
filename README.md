@@ -2,6 +2,8 @@
 
 App for Adafruit PyPortal to display the local weather conditions.  
 
+![PyPortal Screen](/img/screen_example.jpg)
+
 ### Requirements: 
 * Adafruit PyPortal https://www.adafruit.com/product/4116
 * Circuit Python 5.2.0
