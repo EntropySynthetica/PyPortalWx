@@ -87,6 +87,11 @@ def get_current_wx(cityid, api_key):
             continue
 
     weather_json = response.json()
+
+    # Sometimes the openweathermap API does not return a wind direction at all.  Assume a North wind if this happens. 
+    if "deg" not in weather_json['wind']:
+        weather_json['wind']['deg'] = 0
+
     return weather_json
 
 def get_forecast_wx(cityid, api_key):
