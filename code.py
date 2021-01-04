@@ -94,9 +94,9 @@ def get_current_wx(cityid, api_key):
 
     return weather_json
 
-def get_forecast_wx(cityid, api_key):
+def get_forecast_wx(lat, lon, api_key):
     # Get the weather forecast from the weather API server
-    poll_URL = "https://api.openweathermap.org/data/2.5/forecast?id=" + cityid + "&units=imperial&appid=" + api_key 
+    poll_URL = "https://api.openweathermap.org/data/2.5/onecall?units=imperial&exclude=minutely,hourly,alerts,current&lat=" + lat + "&lon=" + lon  + "&appid=" + api_key 
 
     response = None
     while True:
@@ -118,7 +118,7 @@ def degree_to_cardinal(wind_degrees):
     return compass[(val % 16)]
 
 def get_forecast_for_day(forecast_data, day_num):
-    forecast_temps = []
+    forecast_for_day = {}
     if day_num == 7:
         day_num = 0
     elif day_num == 8:
@@ -126,21 +126,19 @@ def get_forecast_for_day(forecast_data, day_num):
     elif day_num == 9:
         day_num = 2
     
-    for item in forecast_data['list']:
+    for item in forecast_data['daily']:
         forecast_time = time.localtime(item['dt'])
 
         if forecast_time[6] == day_num:
-            forecast_temps.append(item['main']['temp'])
 
-    forecast_for_day = {'forecast_temps' : forecast_temps}
-    forecast_for_day.update({'forecast_high' : round(max(forecast_temps))})
-    forecast_for_day.update({'forecast_low' : round(min(forecast_temps))})
+            forecast_for_day.update({'forecast_high' : round(item['temp']['max'])})
+            forecast_for_day.update({'forecast_low' : round(item['temp']['min'])})
     return forecast_for_day
 
 print("Mem Free: " + str(gc.mem_free()))
 sync_rtc(secrets['time_api'])
 current_wx = get_current_wx(secrets['owm_cityid'], secrets['owm_apikey'])
-forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
+forecast_wx = get_forecast_wx(str(current_wx['coord']['lat']), str(current_wx['coord']['lon']), secrets['owm_apikey'])
 
 now = time.localtime()
 day1_forecast = get_forecast_for_day(forecast_wx, now[6] + 1)
