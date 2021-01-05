@@ -161,7 +161,7 @@ while True:
 
     # Resync the forecast at 15 min past the hour.  
     if ((now[4] == 15) and (now[5] == 30)):
-        forecast_wx = get_forecast_wx(secrets['owm_cityid'], secrets['owm_apikey'])
+        forecast_wx = get_forecast_wx(str(current_wx['coord']['lat']), str(current_wx['coord']['lon']), secrets['owm_apikey'])
         day1_forecast = get_forecast_for_day(forecast_wx, now[6] + 1)
         day2_forecast = get_forecast_for_day(forecast_wx, now[6] + 2)
         day3_forecast = get_forecast_for_day(forecast_wx, now[6] + 3)
