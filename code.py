@@ -133,6 +133,7 @@ def get_forecast_for_day(forecast_data, day_num):
 
             forecast_for_day.update({'forecast_high' : round(item['temp']['max'])})
             forecast_for_day.update({'forecast_low' : round(item['temp']['min'])})
+            forecast_for_day.update({'forecast_icon' : item['weather'][0]['icon']})
     return forecast_for_day
 
 print("Mem Free: " + str(gc.mem_free()))
@@ -218,27 +219,48 @@ while True:
     city_text_group = displayio.Group()
     city_text_group.append(city_text_area)
 
+    # Day1 Conditions Icon
+    icon_day1_path = "/icons/small/" + day1_forecast['forecast_icon'] + ".bmp"
+    icon_day1_bitmap = displayio.OnDiskBitmap(open(icon_day1_path, "rb"))
+    icon_day1_tilegrid = displayio.TileGrid(icon_day1_bitmap, pixel_shader=displayio.ColorConverter())
+    icon_day1_tilegrid.x = 5
+    icon_day1_tilegrid.y = 180
+
     # Display Day 1 Forecast
     day_name_forecast = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed']
     day1_forecast_text = day_name_forecast[now[6] + 1] + "\r\nH: " + str(day1_forecast['forecast_high']) + "°\r\nL: " + str(day1_forecast['forecast_low']) + "°"
     day1_forecast_text_area = label.Label(font, text=day1_forecast_text, color=color_white, line_spacing=0.9)
-    day1_forecast_text_area.x = 20
+    day1_forecast_text_area.x = 50
     day1_forecast_text_area.y = 200
     day1_forecast_text_group = displayio.Group()
     day1_forecast_text_group.append(day1_forecast_text_area)
 
+    # Day2 Conditions Icon
+    icon_day2_path = "/icons/small/" + day2_forecast['forecast_icon'] + ".bmp"
+    icon_day2_bitmap = displayio.OnDiskBitmap(open(icon_day2_path, "rb"))
+    icon_day2_tilegrid = displayio.TileGrid(icon_day2_bitmap, pixel_shader=displayio.ColorConverter())
+    icon_day2_tilegrid.x = 115
+    icon_day2_tilegrid.y = 180
+
     # Display Day 2 Forecast
     day2_forecast_text = day_name_forecast[now[6] + 2] + "\r\nH: " + str(day2_forecast['forecast_high']) + "°\r\nL: " + str(day2_forecast['forecast_low']) + "°"
     day2_forecast_text_area = label.Label(font, text=day2_forecast_text, color=color_white, line_spacing=0.9)
-    day2_forecast_text_area.x = 130
+    day2_forecast_text_area.x = 160
     day2_forecast_text_area.y = 200
     day2_forecast_text_group = displayio.Group()
     day2_forecast_text_group.append(day2_forecast_text_area)
 
+    # Day3 Conditions Icon
+    icon_day3_path = "/icons/small/" + day3_forecast['forecast_icon'] + ".bmp"
+    icon_day3_bitmap = displayio.OnDiskBitmap(open(icon_day3_path, "rb"))
+    icon_day3_tilegrid = displayio.TileGrid(icon_day3_bitmap, pixel_shader=displayio.ColorConverter())
+    icon_day3_tilegrid.x = 215
+    icon_day3_tilegrid.y = 180
+
     # Display Day 3 Forecast
     day3_forecast_text = day_name_forecast[now[6] + 3] + "\r\nH: " + str(day3_forecast['forecast_high']) + "°\r\nL: " + str(day3_forecast['forecast_low']) + "°"
     day3_forecast_text_area = label.Label(font, text=day3_forecast_text, color=color_white, line_spacing=0.9)
-    day3_forecast_text_area.x = 240
+    day3_forecast_text_area.x = 260
     day3_forecast_text_area.y = 200
     day3_forecast_text_group = displayio.Group()
     day3_forecast_text_group.append(day3_forecast_text_area)
@@ -263,9 +285,12 @@ while True:
     icon_tilegrid.y = 35
 
     # Package up all the groups to pass to the display.
-    group = displayio.Group(max_size=10)
+    group = displayio.Group(max_size=13)
     group.append(background2)
     group.append(icon_tilegrid)
+    group.append(icon_day1_tilegrid)
+    group.append(icon_day2_tilegrid)
+    group.append(icon_day3_tilegrid)
     group.append(background1)
     #group.append(mem_text_group)
     group.append(time_text_group)
