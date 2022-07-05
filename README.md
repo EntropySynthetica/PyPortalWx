@@ -6,7 +6,7 @@ App for Adafruit PyPortal to display the local weather conditions.
 
 ### Requirements: 
 * Adafruit PyPortal https://www.adafruit.com/product/4116
-* Circuit Python 5.2.0
+* Circuit Python 7.x (Tested with 7.3.1)
 * A free API key for OpenWeatherMap.org https://openweathermap.org/appid
 
 ### Use:
