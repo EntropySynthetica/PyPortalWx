@@ -194,7 +194,7 @@ while True:
     time_text = timenow + "\n" + datenow
     time_text_area = label.Label(font, text=time_text, color=color_white, line_spacing=0.9)
     time_text_area.x = 220
-    time_text_area.y = 20
+    time_text_area.y = 15
     time_text_group = displayio.Group()
     time_text_group.append(time_text_area)
 
@@ -207,7 +207,7 @@ while True:
     cur_conditions_text = temp_out + "\n" + wind_dir +"\n" + hum_out + "\n" + baro_out
     cur_conditions_text_area = label.Label(font, text=cur_conditions_text, color=color_white, line_spacing=0.9)
     cur_conditions_text_area.x = 190
-    cur_conditions_text_area.y = 110
+    cur_conditions_text_area.y = 85
     cur_conditions_text_group = displayio.Group()
     cur_conditions_text_group.append(cur_conditions_text_area)
 
@@ -215,7 +215,7 @@ while True:
     city_text = "Conditions at " + current_wx['name'] + "\n" + current_wx['weather'][0]['description']
     city_text_area = label.Label(font, text=city_text, color=color_white, line_spacing=0.9)
     city_text_area.x = 10
-    city_text_area.y = 20
+    city_text_area.y = 15
     city_text_group = displayio.Group()
     city_text_group.append(city_text_area)
 
@@ -224,14 +224,14 @@ while True:
     icon_day1_bitmap = displayio.OnDiskBitmap(open(icon_day1_path, "rb"))
     icon_day1_tilegrid = displayio.TileGrid(icon_day1_bitmap, pixel_shader=displayio.ColorConverter())
     icon_day1_tilegrid.x = 5
-    icon_day1_tilegrid.y = 180
+    icon_day1_tilegrid.y = 175
 
     # Display Day 1 Forecast
     day_name_forecast = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed']
     day1_forecast_text = day_name_forecast[now[6] + 1] + "\r\nH: " + str(day1_forecast['forecast_high']) + "°\r\nL: " + str(day1_forecast['forecast_low']) + "°"
     day1_forecast_text_area = label.Label(font, text=day1_forecast_text, color=color_white, line_spacing=0.9)
     day1_forecast_text_area.x = 50
-    day1_forecast_text_area.y = 200
+    day1_forecast_text_area.y = 190
     day1_forecast_text_group = displayio.Group()
     day1_forecast_text_group.append(day1_forecast_text_area)
 
@@ -240,13 +240,13 @@ while True:
     icon_day2_bitmap = displayio.OnDiskBitmap(open(icon_day2_path, "rb"))
     icon_day2_tilegrid = displayio.TileGrid(icon_day2_bitmap, pixel_shader=displayio.ColorConverter())
     icon_day2_tilegrid.x = 115
-    icon_day2_tilegrid.y = 180
+    icon_day2_tilegrid.y = 175
 
     # Display Day 2 Forecast
     day2_forecast_text = day_name_forecast[now[6] + 2] + "\r\nH: " + str(day2_forecast['forecast_high']) + "°\r\nL: " + str(day2_forecast['forecast_low']) + "°"
     day2_forecast_text_area = label.Label(font, text=day2_forecast_text, color=color_white, line_spacing=0.9)
     day2_forecast_text_area.x = 160
-    day2_forecast_text_area.y = 200
+    day2_forecast_text_area.y = 190
     day2_forecast_text_group = displayio.Group()
     day2_forecast_text_group.append(day2_forecast_text_area)
 
@@ -255,13 +255,13 @@ while True:
     icon_day3_bitmap = displayio.OnDiskBitmap(open(icon_day3_path, "rb"))
     icon_day3_tilegrid = displayio.TileGrid(icon_day3_bitmap, pixel_shader=displayio.ColorConverter())
     icon_day3_tilegrid.x = 215
-    icon_day3_tilegrid.y = 180
+    icon_day3_tilegrid.y = 175
 
     # Display Day 3 Forecast
     day3_forecast_text = day_name_forecast[now[6] + 3] + "\r\nH: " + str(day3_forecast['forecast_high']) + "°\r\nL: " + str(day3_forecast['forecast_low']) + "°"
     day3_forecast_text_area = label.Label(font, text=day3_forecast_text, color=color_white, line_spacing=0.9)
     day3_forecast_text_area.x = 260
-    day3_forecast_text_area.y = 200
+    day3_forecast_text_area.y = 190
     day3_forecast_text_group = displayio.Group()
     day3_forecast_text_group.append(day3_forecast_text_area)
 
@@ -285,7 +285,7 @@ while True:
     icon_tilegrid.y = 35
 
     # Package up all the groups to pass to the display.
-    group = displayio.Group(max_size=13)
+    group = displayio.Group()
     group.append(background2)
     group.append(icon_tilegrid)
     group.append(icon_day1_tilegrid)
