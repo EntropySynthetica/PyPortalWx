@@ -74,7 +74,7 @@ def sync_rtc(time_api):
 
 def get_current_wx(cityid, api_key):
     # Get the current condtions from the weather API server
-    poll_URL = "https://api.openweathermap.org/data/3.0/weather?id=" + cityid + "&units=imperial&appid=" + api_key 
+    poll_URL = "https://api.openweathermap.org/data/2.5/weather?id=" + cityid + "&units=imperial&appid=" + api_key 
 
     response = None
     while True:
