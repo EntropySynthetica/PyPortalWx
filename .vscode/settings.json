@@ -1,0 +1,21 @@
+{
+    "cSpell.words": [
+        "adafruit",
+        "apikey",
+        "baro",
+        "busio",
+        "cityid",
+        "condtions",
+        "darkpurple",
+        "datenow",
+        "digitalio",
+        "displayio",
+        "ESPSPI",
+        "mday",
+        "MOSI",
+        "neopixel",
+        "openweathermap",
+        "tilegrid",
+        "wifimanager"
+    ]
+}

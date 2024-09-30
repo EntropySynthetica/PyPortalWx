@@ -1,20 +1,20 @@
 import sys
 import time
-import board
-import busio
-import neopixel
-import gc
-import rtc # For interfacing with the Real Time Clock
-import displayio # Library for writing text / graphics to the screen
-from adafruit_display_shapes.rect import Rect # Library to draw rectangles
-from digitalio import DigitalInOut # Enabling DigitalIO so we can talk to the ESP32 Wifi chip.
-from adafruit_bitmap_font import bitmap_font
-from adafruit_display_text import label
-from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager
+import board # type: ignore
+import busio # type: ignore
+import neopixel # type: ignore
+import gc # type: ignore
+import rtc # type: ignore # For interfacing with the Real Time Clock
+import displayio # type: ignore # Library for writing text / graphics to the screen
+from adafruit_display_shapes.rect import Rect # type: ignore # Library to draw rectangles
+from digitalio import DigitalInOut # type: ignore # Enabling DigitalIO so we can talk to the ESP32 Wifi chip.
+from adafruit_bitmap_font import bitmap_font # type: ignore
+from adafruit_display_text import label # type: ignore
+from adafruit_esp32spi import adafruit_esp32spi, adafruit_esp32spi_wifimanager # type: ignore
 
 # Get wifi and api secrets
 try:
-    from secrets import secrets
+    from secrets import secrets # type: ignore
 except ImportError:
     print("Error: Could not load secrets from secrets.py")
     raise
